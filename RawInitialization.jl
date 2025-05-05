@@ -20,19 +20,24 @@ test_material = Material(name="Test Material", density=1e3, elastic_modulus=1e7,
 
                 # id, pos, vel, acc, mass, radius, r_hist
 p1 = Particle(id=1, coord=[-0.5, 0.0], vel_trl=[2.0, 0.0], radius=0.5, material=test_material)
-initialize_densityprops(p1) # Initialize density properties
+initialize_props(p1) # Initialize density properties
 
 
 p2 = Particle(id=2, coord=[0.6, 0.0], vel_trl=[-2.0, 0.0], radius=0.5, material=test_material)
-initialize_densityprops(p2) # Initialize density properties
+initialize_props(p2) # Initialize density properties
 
 particles = [p1,p2]
 
 # Initializing History Variables
 for p in particles
-    p.pos_hist = copy([p.coord])
-    p.vel_hist = copy([p.vel_trl])
-    p.acc_hist = copy([p.acc_trl])
+    p.coord_hist = copy([p.coord])
+    p.orient_hist = copy([p.orient])
+    p.vel_trl_hist = copy([p.vel_trl])
+    p.vel_rot_hist = copy([p.vel_rot])
+    p.acc_trl_hist = copy([p.acc_trl])
+    p.acc_rot_hist = copy([p.acc_rot])
+    #p.force_hist = copy([p.force])
+    #p.torque_hist = copy([p.torque])
 end
 
 interaction_list = Interaction[]  # Initialize empty interaction list
