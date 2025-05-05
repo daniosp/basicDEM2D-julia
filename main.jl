@@ -24,7 +24,7 @@ include("Interactions.jl")
 include("SearchAlgs_EqSPatialPart.jl")
 
 include("IntegrationScheme.jl")
-include("Forces.jl")
+include("ForcesCompRoutine.jl")
 
 include("RawInitialization.jl")
 include("SearchAlgsRoutine.jl")
@@ -67,7 +67,7 @@ function main()
 
         interaction_list = search_algorithm_routine!(interaction_list, particles, search_alg, grid)
 
-        force_computation_routine!(interaction_list, CoR)
+        force_computation_routine!(interaction_list, CoR, dt)
 
         for particle in particles
             update_particle!(particle, dt)

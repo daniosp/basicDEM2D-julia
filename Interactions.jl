@@ -10,6 +10,10 @@ by Daniel Ospina Pajoy
 prof. Juan Manuel Rodriguez Prieto
 =#
 
+include("Particles.jl")  # Include the Particles module
+include("BinKinematics.jl")  # Include the BinKinematics module
+include("ContactForceN.jl")  # Include the ContactForceN module
+
 @with_kw mutable struct Interaction
     particle1::Particle = Particle()  # First particle in the interaction
     particle2::Particle = Particle() # Second particle in the interaction
@@ -17,8 +21,11 @@ prof. Juan Manuel Rodriguez Prieto
     eff_radius::Float64 = 0.0  # Effective radius for the interaction
     eff_mass::Float64 = 0.0  # Effective mass for the interaction
     eff_young::Float64 = 0.0  # Effective Young's modulus for the interaction
+    avg_poisson::Float64 = 0.0  # Average Poisson's ratio for the interaction
 
     kinemat::BinKinematics = BinKinematics() # Kinematic properties of the interaction
+    cforce_n::ContactForceN = ContactForceN()  # Normal contact force parameters
+    cforce_t::ContactForceT = ContactForceT()  # Tangential contact force parameters
 
     in_list::Bool = false  # Flag to check if interaction is in the list
     in_search::Bool = false  # Flag to check if interaction is in the search algorithm
@@ -29,6 +36,7 @@ function compute_effprops!(interaction::Interaction)  # Compute effective proper
     interaction.eff_radius = (1/interaction.particle1.radius + 1/interaction.particle2.radius)^(-1)  # Effective radius
     interaction.eff_mass = (interaction.particle1.mass * interaction.particle2.mass) / (interaction.particle1.mass + interaction.particle2.mass)
     interaction.eff_young = ((1-interaction.particle1.material.poisson_ratio^2) / interaction.particle1.material.elastic_modulus + (1-interaction.particle2.material.poisson_ratio^2) / interaction.particle2.material.elastic_modulus)^(-1)  # Effective Young's modulus
+    interaction.avg_poisson = (interaction.particle1.material.poisson_ratio + interaction.particle2.material.poisson_ratio) / 2  # Average Poisson's ratio
 end
 
 function manage_interaction_list!(interaction_list::Vector{Interaction},new_interaction::Interaction)  # Add interaction between particles
