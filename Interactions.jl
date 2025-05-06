@@ -10,10 +10,6 @@ by Daniel Ospina Pajoy
 prof. Juan Manuel Rodriguez Prieto
 =#
 
-include("Particles.jl")  # Include the Particles module
-include("BinKinematics.jl")  # Include the BinKinematics module
-include("ContactForceN.jl")  # Include the ContactForceN module
-
 @with_kw mutable struct Interaction
     particle1::Particle = Particle()  # First particle in the interaction
     particle2::Particle = Particle() # Second particle in the interaction

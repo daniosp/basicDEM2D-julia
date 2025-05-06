@@ -23,6 +23,7 @@
     ini_overlap_vel_n ::Float64 = 0.0 # Initial overlap velocity on contact
 end
 
+
 function initialize_binKinematics(bin::BinKinematics,particle1::Particle,particle2::Particle, dt::Float64)
 
     bin.dir = particle2.coord - particle1.coord  # Calculate direction vector between particles

@@ -1,8 +1,8 @@
 @with_kw mutable struct ContactForceN
     # Normal contact force parameters
  
-    type::String = "viscoelastic_linear"  # Type of normal contact force
-    formula::String = "energy"  # Formula for normal contact force
+    type::String = "none"  # Type of normal contact force
+    formula::String = "none"  # Formula for normal contact force
     CoR::Float64 = 0.0  # Coefficient of restitution for normal contact force
     k_n::Float64 = 0.0  # Stiffness for normal contact force
     gamma_n::Float64 = 0.0  # Damping coefficient for normal contact force
@@ -41,11 +41,14 @@ function compute_normal_force!(interaction::Interaction)
 
         end
 
-        cforce_n.gamma_n = sqrt((4*interaction.eff_mass*k_n)/(1+beta^2))  # Damping coefficient
+        cforce_n.gamma_n = sqrt((4*interaction.eff_mass*cforce_n.k_n)/(1+beta^2))  # Damping coefficient
 
         elastic_force = cforce_n.k_n * bin.overlap_n  
         damping_force = cforce_n.gamma_n * bin.overlap_vel_n
 
+    elseif cforce_n.type == "none"
+        elastic_force = 0.0  # Reset elastic force if type is none
+        damping_force = 0.0  # Reset damping force if type is none 
     end
 
     cforce_n.total_force = elastic_force + damping_force  # Magnitude of the contact force

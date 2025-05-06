@@ -20,11 +20,14 @@ using Parameters
 include("Materials.jl")
 include("Particles.jl")
 include("BinKinematics.jl")
+include("ContactForceN.jl")
+include("ContactForceT.jl")
 include("Interactions.jl")
 include("SearchAlgs_EqSPatialPart.jl")
 
 include("IntegrationScheme.jl")
 include("ForcesCompRoutine.jl")
+
 
 include("RawInitialization.jl")
 include("SearchAlgsRoutine.jl")
@@ -67,7 +70,7 @@ function main()
 
         interaction_list = search_algorithm_routine!(interaction_list, particles, search_alg, grid)
 
-        force_computation_routine!(interaction_list, CoR, dt)
+        forces_computation_routine!(interaction_list, dt)
 
         for particle in particles
             update_particle!(particle, dt)
@@ -77,13 +80,13 @@ function main()
         current_time += dt
     end
 
-    animation = @animate for i in 1:length(particles[1].pos_hist)
+    animation = @animate for i in 1:length(particles[1].coord_hist)
 
-        x, y = circleShape(particles[1].pos_hist[i][1], particles[1].pos_hist[i][2], particles[1].radius)
+        x, y = circleShape(particles[1].coord_hist[i][1], particles[1].coord_hist[i][2], particles[1].radius)
         plot(x, y, xlim=(-2, 2), ylim=(-2, 2), ratio=1, legend=false, c=:green, plot_title="Binary Collision")
     
         for p in particles[2:end]
-            x, y = circleShape(p.pos_hist[i][1], p.pos_hist[i][2], p.radius)
+            x, y = circleShape(p.coord_hist[i][1], p.coord_hist[i][2], p.radius)
             plot!(x, y, xlim=(-2, 2), ylim=(-2, 2), ratio=1, legend=false, c=:green)
         end
     
@@ -91,7 +94,7 @@ function main()
     
     gif(animation, "./results/testMicCheck12.gif", fps = 200)
 
-    pos_p1 = first.(particles[1].pos_hist)
+    pos_p1 = first.(particles[1].coord_hist)
     outfile = "./results/Horizontal Position basicDEM.txt"
     open(outfile, "w") do f
       for i in pos_p1
@@ -99,7 +102,7 @@ function main()
       end
     end # the file f is automatically closed after this block finishes
     
-    vel_p1 = first.(particles[1].vel_hist)
+    vel_p1 = first.(particles[1].vel_trl_hist)
     outfile = "./results/Horizontal Velocity basicDEM.txt"
     open(outfile, "w") do f
       for i in vel_p1
@@ -107,7 +110,7 @@ function main()
       end
     end # the file f is automatically closed after this block finishes
     
-    acc_p1 = first.(particles[1].acc_hist)
+    acc_p1 = first.(particles[1].acc_trl_hist)
     outfile = "./results/Horizontal Acceleration basicDEM.txt"
     open(outfile, "w") do f
       for i in acc_p1

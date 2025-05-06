@@ -31,8 +31,10 @@ prof. Juan Manuel Rodriguez Prieto
     # Kinematic Properties
     coord::Vector{Float64} = [0.0, 0.0]  # Default position vector
     orient::Float64 = 0.0  # Default orientation angle
+
     vel_trl::Vector{Float64} = [0.0, 0.0]  # Default velocity vector
     vel_rot::Float64 = 0.0  # Default angular velocity (scalar for 2D problems)
+
     acc_trl::Vector{Float64} = [0.0, 0.0]  # Default acceleration vector
     acc_rot::Float64 = 0.0  # Default angular acceleration (scalar for 2D problems)
 
