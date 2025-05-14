@@ -20,9 +20,10 @@ using Parameters
 include("Materials.jl")
 include("Particles.jl")
 include("BinKinematics.jl")
-include("ContactForceN.jl")
-include("ContactForceT.jl")
+
 include("Interactions.jl")
+
+
 include("SearchAlgs_EqSPatialPart.jl")
 
 include("IntegrationScheme.jl")
@@ -30,6 +31,7 @@ include("ForcesCompRoutine.jl")
 
 
 include("RawInitialization.jl")
+include("RawInitialization_billiard.jl")
 include("SearchAlgsRoutine.jl")
 
 
@@ -64,35 +66,48 @@ Base.copy(x::T) where T = T([getfield(x, k) for k ∈ fieldnames(T)]...)
 
 function main()
 
-    particles, interaction_list, search_alg, dt, simulation_time, current_time, CoR, grid = raw_initialization()
+    particles, interaction_list, search_alg, dt, simulation_time, current_time, CoR, grid = raw_initialization_billiard()
 
     while current_time <= simulation_time
 
         interaction_list = search_algorithm_routine!(interaction_list, particles, search_alg, grid)
-
+        
         forces_computation_routine!(interaction_list, dt)
 
         for particle in particles
             update_particle!(particle, dt)
         end
+
+        println(pointer_from_objref(interaction_list[1]))
+        println(pointer_from_objref(particles[interaction_list[1].particle1.id]))
+
         
 
         current_time += dt
     end
 
+    xlimits = (-2, 3)
+    ylimits = (-1, 1)
+
     animation = @animate for i in 1:length(particles[1].coord_hist)
 
         x, y = circleShape(particles[1].coord_hist[i][1], particles[1].coord_hist[i][2], particles[1].radius)
-        plot(x, y, xlim=(-2, 2), ylim=(-2, 2), ratio=1, legend=false, c=:green, plot_title="Binary Collision")
+        this_plot = plot(x, y, xlim=xlimits, ylim=ylimits, ratio=1, legend=false, c=:black, plot_title="Billiard Animation")
+
+        x, y = radius_orientation(particles[1].coord_hist[i][1],particles[1].coord_hist[i][2], particles[1].radius, particles[1].orient_hist[i])
+        plot!(this_plot, x, y, xlim=xlimits, ylim=ylimits, ratio=1, legend=false, c=:black)
     
         for p in particles[2:end]
             x, y = circleShape(p.coord_hist[i][1], p.coord_hist[i][2], p.radius)
-            plot!(x, y, xlim=(-2, 2), ylim=(-2, 2), ratio=1, legend=false, c=:green)
+            plot!(this_plot, x, y, xlim=xlimits, ylim=ylimits, ratio=1, legend=false, c=:black)
+
+            x, y = radius_orientation(p.coord_hist[i][1],p.coord_hist[i][2], p.radius, p.orient_hist[i])
+            plot!(this_plot, x, y, xlim=xlimits, ylim=ylimits, ratio=1, legend=false, c=:black)
         end
     
     end
     
-    gif(animation, "./results/testMicCheck12.gif", fps = 200)
+    gif(animation, "./results/billiardTest.gif", fps = 200)
 
     pos_p1 = first.(particles[1].coord_hist)
     outfile = "./results/Horizontal Position basicDEM.txt"
@@ -101,6 +116,15 @@ function main()
         println(f, i)
       end
     end # the file f is automatically closed after this block finishes
+
+    posy_p1 = map(v -> v[2], particles[1].coord_hist)
+    outfile = "./results/Vertical Position basicDEM.txt"
+    open(outfile, "w") do f
+      for i in posy_p1
+        println(f, i)
+      end
+    end # the file f is automatically closed after this block finishes
+    
     
     vel_p1 = first.(particles[1].vel_trl_hist)
     outfile = "./results/Horizontal Velocity basicDEM.txt"
@@ -131,6 +155,15 @@ function circleShape(h,k,r)
     x = h .+ r*cos.(θ)
     y = k .+ r*sin.(θ)
     return x,y
+
+end
+
+function radius_orientation(h,k,r,theta)
+
+  r_end_x = h + r*cos(theta)
+  r_end_y = k + r*sin(theta) 
+  
+  return [h, r_end_x], [k, r_end_y]
 
 end
 

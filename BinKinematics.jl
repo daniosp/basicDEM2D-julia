@@ -20,6 +20,7 @@
 
     # Contact parameters
     in_contact ::Bool = false
+    first_contact::Bool = false
     ini_overlap_vel_n ::Float64 = 0.0 # Initial overlap velocity on contact
 end
 
@@ -35,7 +36,7 @@ function initialize_binKinematics(bin::BinKinematics,particle1::Particle,particl
 
     # Positions of the contact points relative to the centroids (It is assumed as half of the overlap)
     c1 = (particle1.radius - bin.overlap_n/2) * bin.dir_n  # Contact point on particle 1
-    c2 = (particle2.radius - bin.overlap_n/2) * bin.dir_n  # Contact point on particle 2
+    c2 = -(particle2.radius - bin.overlap_n/2) * bin.dir_n  # Contact point on particle 2
 
     # Velocities at contact points
     w1 = cross([0; 0; particle1.vel_rot] , [c1[1]; c1[2]; 0])  # Angular velocity of particle 1
@@ -53,7 +54,7 @@ function initialize_binKinematics(bin::BinKinematics,particle1::Particle,particl
     bin.rel_t_vel = bin.rel_vel - bin.overlap_vel_n * bin.dir_n  # Calculate tangential relative velocity vector
 
     # Tangential unit vector
-    if norm(bin.rel_t_vel) > 0.0
+    if norm(bin.rel_t_vel) > 1e-10  # Check if tangential velocity is non-zero
         bin.dir_t = bin.rel_t_vel / norm(bin.rel_t_vel)  # Normalize the tangential direction vector
     else
         bin.dir_t = [0.0, 0.0]  # Set to zero if no tangential velocity
@@ -61,13 +62,5 @@ function initialize_binKinematics(bin::BinKinematics,particle1::Particle,particl
 
     # Calculate tangential overlap velocity
     bin.overlap_vel_t = dot(bin.rel_vel,bin.dir_t)  # Calculate tangential overlap velocity
-
-    # Calculate tangential overlap
-
-    if bin.overlap_t < 1e-14
-        bin.overlap_t = bin.overlap_vel_t * dt  # Calculate tangential overlap
-    else
-        bin.overlap_t += bin.overlap_vel_t * dt  # Update tangential overlap
-    end
 
 end

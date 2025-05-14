@@ -23,18 +23,20 @@ function search_algorithm_routine!(interaction_list::Vector{Interaction}, partic
 
     # Reset interaction list and search flags
 
+
+
 reset_interaction_searchflag!(interaction_list)
 
 if search_alg == "simple_loop"
     for particle in particles
         for neighbor in particles
+
             if particle.id !== neighbor.id  # Avoid self-interaction
 
                 temp_int = Interaction(particle1=particle, particle2=neighbor)  # Create interaction object
                 compute_effprops!(temp_int)  # Compute effective properties for the interaction
                 manage_interaction_list!(interaction_list, temp_int)  # Add interaction to the list
                 temp_int = nothing  # Clear temporary interaction object
-                return interaction_list
             end
         end
     end
@@ -57,12 +59,16 @@ elseif search_alg == "eq_spatial_part"
                 compute_effprops!(temp_int)  # Compute effective properties for the interaction
                 manage_interaction_list!(interaction_list, temp_int)  # Add interaction to the list
                 temp_int = nothing  # Clear temporary interaction object
-                return interaction_list
+                
             end
         end
     end
+
+    
 end
 
 interaction_list = pop_from_interaction_list!(interaction_list)
+
+return interaction_list
 
 end

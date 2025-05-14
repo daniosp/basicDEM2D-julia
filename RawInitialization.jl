@@ -5,7 +5,7 @@ function raw_initialization()
 # Simulation Time Parameters
 framerate = 200;
 dt = 0.01;
-simulation_time = 0.2;
+simulation_time = 1.0;
 current_time = 0.0;
 
 # Physics Parameters
@@ -19,11 +19,11 @@ test_material = Material(name="Test Material", density=1e3, elastic_modulus=1e7,
 # Initializing Particles
 
                 # id, pos, vel, acc, mass, radius, r_hist
-p1 = Particle(id=1, coord=[-0.5, 0.0], vel_trl=[2.0, 0.0], radius=0.5, material=test_material)
+p1 = Particle(id=1, coord=[-1.0, 0.0], vel_trl=[2.0, 0.5],vel_rot=1.0, radius=0.5, material=test_material)
 initialize_props(p1) # Initialize density properties
 
 
-p2 = Particle(id=2, coord=[0.6, 0.0], vel_trl=[-2.0, 0.0], radius=0.5, material=test_material)
+p2 = Particle(id=2, coord=[1.0, 0.0], vel_trl=[-2.0, 0.0], radius=0.5, material=test_material)
 initialize_props(p2) # Initialize density properties
 
 particles = [p1,p2]
